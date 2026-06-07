@@ -1,34 +1,35 @@
 // Copyright 2021 NNTU-CS
-#include <cctype>
+#include <algorithm>
 #include <fstream>
 #include <iostream>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "bst.h"
 
+static bool IsEnglishLetter(char ch) {
+  return (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z');
+}
+
+static char ToLower(char ch) {
+  if (ch >= 'A' && ch <= 'Z') return ch + ('a' - 'A');
+  return ch;
+}
+
 void makeTree(BST<std::string>& tree, const char* filename) {
   std::ifstream file(filename);
-  if (!file) {
+  if (!file.is_open()) {
     std::cerr << "File error: " << filename << "\n";
     return;
-  }
-
-  std::string line;
-  while (std::getline(file, line)) {
-    if (line.find("*** START OF THE PROJECT GUTENBERG EBOOK") !=
-        std::string::npos) {
-      break;
-    }
   }
 
   std::string word;
   char ch;
 
   while (file.get(ch)) {
-    unsigned char uch = static_cast<unsigned char>(ch);
-    if (std::isalpha(uch) && uch < 128) {
-      word += static_cast<char>(std::tolower(uch));
+    if (IsEnglishLetter(ch)) {
+      word += ToLower(ch);
     } else if (!word.empty()) {
       tree.insert(word);
       word.clear();
@@ -40,20 +41,22 @@ void makeTree(BST<std::string>& tree, const char* filename) {
   }
 }
 
-void printFreq(BST<std::string>& tree) {
-  std::vector<BST<std::string>::Entry> entries = tree.getFreqSorted();
+static bool ByFreqDesc(const std::pair<std::string, int>& a,
+                       const std::pair<std::string, int>& b) {
+  return a.second > b.second;
+}
 
-  for (const auto& entry : entries) {
-    std::cout << entry.value << " " << entry.count << "\n";
-  }
+void printFreq(BST<std::string>& tree) {
+  std::vector<std::pair<std::string, int>> items;
+  tree.collectInfo(items);
+  std::sort(items.begin(), items.end(), ByFreqDesc);
 
   std::ofstream out("result/freq.txt");
-  if (!out) {
-    std::cerr << "Warning: could not write result/freq.txt\n";
-    return;
-  }
 
-  for (const auto& entry : entries) {
-    out << entry.value << " " << entry.count << "\n";
+  for (const auto& entry : items) {
+    std::cout << entry.first << " " << entry.second << "\n";
+    if (out.is_open()) {
+      out << entry.first << " " << entry.second << "\n";
+    }
   }
 }
