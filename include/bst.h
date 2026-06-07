@@ -11,22 +11,17 @@
 template <typename T>
 class BST {
  public:
-  // Inserts value; increments counter if already present.
   void insert(const T& value) { root_ = Insert(std::move(root_), value); }
 
-  // Returns tree height (0 for empty tree).
   int depth() const { return Depth(root_.get()); }
 
-  // Returns occurrence count of value, or 0 if not found.
   int search(const T& value) const {
     Node* node = Search(root_.get(), value);
     return node ? node->count : 0;
   }
 
-  // Returns number of unique nodes.
   int size() const { return Size(root_.get()); }
 
-  // Fills items with all (value, count) pairs in sorted order.
   void collectInfo(std::vector<std::pair<T, int>>& items) const {
     Collect(root_.get(), items);
   }
