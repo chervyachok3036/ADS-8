@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <memory>
 #include <string>
+#include <utility>
 #include <vector>
 
 template <typename T>
@@ -15,20 +16,20 @@ class BST {
     int count;
   };
 
-  void Insert(const T& value) { root_ = Insert(std::move(root_), value); }
+  void insert(const T& value) { root_ = Insert(std::move(root_), value); }
 
-  int Depth() const { return Depth(root_.get()); }
+  int depth() const { return Depth(root_.get()); }
 
-  int Search(const T& value) const {
+  int search(const T& value) const {
     Node* node = Search(root_.get(), value);
     return node ? node->count : 0;
   }
 
-  int Size() const { return Size(root_.get()); }
+  int size() const { return Size(root_.get()); }
 
-  std::vector<Entry> GetFreqSorted() const {
+  std::vector<Entry> getFreqSorted() const {
     std::vector<Entry> entries;
-    entries.reserve(Size());
+    entries.reserve(size());
     Collect(root_.get(), &entries);
     std::stable_sort(entries.begin(), entries.end(),
                      [](const Entry& a, const Entry& b) {
