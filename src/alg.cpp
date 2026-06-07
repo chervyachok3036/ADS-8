@@ -14,12 +14,19 @@ void makeTree(BST<std::string>& tree, const char* filename) {
     return;
   }
 
-  std::string word;
-  int ch;
+  unsigned char bom[3] = {0};
+  file.read(reinterpret_cast<char*>(bom), 3);
+  if (!(bom[0] == 0xEF && bom[1] == 0xBB && bom[2] == 0xBF)) {
+    file.seekg(0);
+  }
 
-  while ((ch = file.get()) != EOF) {
-    if (std::isalpha(ch) && static_cast<unsigned char>(ch) < 128) {
-      word += static_cast<char>(std::tolower(ch));
+  std::string word;
+  char ch;
+
+  while (file.get(ch)) {
+    unsigned char uch = static_cast<unsigned char>(ch);
+    if (std::isalpha(uch) && uch < 128) {
+      word += static_cast<char>(std::tolower(uch));
     } else if (!word.empty()) {
       tree.insert(word);
       word.clear();
