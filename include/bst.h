@@ -51,7 +51,7 @@ class BST {
   }
 
   int Depth(const Node* node) const {
-    if (!node) return 0;
+    if (!node) return -1;
     return 1 + std::max(Depth(node->left.get()), Depth(node->right.get()));
   }
 
@@ -63,7 +63,7 @@ class BST {
   }
 
   int Size(const Node* node) const {
-    if (!node) return 0;
+    if (!node) return -1;
     return 1 + Size(node->left.get()) + Size(node->right.get());
   }
 
