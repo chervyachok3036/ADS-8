@@ -14,10 +14,12 @@ void makeTree(BST<std::string>& tree, const char* filename) {
     return;
   }
 
-  unsigned char bom[3] = {0};
-  file.read(reinterpret_cast<char*>(bom), 3);
-  if (!(bom[0] == 0xEF && bom[1] == 0xBB && bom[2] == 0xBF)) {
-    file.seekg(0);
+  std::string line;
+  while (std::getline(file, line)) {
+    if (line.find("*** START OF THE PROJECT GUTENBERG EBOOK") !=
+        std::string::npos) {
+      break;
+    }
   }
 
   std::string word;
