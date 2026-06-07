@@ -7,7 +7,7 @@
 #include <string>
 #include <vector>
 
-void MakeTree(BST<std::string>& tree, const char* filename) {
+void makeTree(BST<std::string>& tree, const char* filename) {
   std::ifstream file(filename);
   if (!file) {
     std::cerr << "File error: " << filename << "\n";
@@ -31,7 +31,7 @@ void MakeTree(BST<std::string>& tree, const char* filename) {
   }
 }
 
-void PrintFreq(BST<std::string>& tree) {
+void printFreq(BST<std::string>& tree) {
   std::vector<BST<std::string>::Entry> entries = tree.GetFreqSorted();
 
   for (const auto& entry : entries) {
