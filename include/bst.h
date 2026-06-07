@@ -11,31 +11,24 @@
 template <typename T>
 class BST {
  public:
-  struct Entry {
-    T value;
-    int count;
-  };
-
+  // Inserts value; increments counter if already present.
   void insert(const T& value) { root_ = Insert(std::move(root_), value); }
 
+  // Returns tree height (0 for empty tree).
   int depth() const { return Depth(root_.get()); }
 
+  // Returns occurrence count of value, or 0 if not found.
   int search(const T& value) const {
     Node* node = Search(root_.get(), value);
     return node ? node->count : 0;
   }
 
+  // Returns number of unique nodes.
   int size() const { return Size(root_.get()); }
 
-  std::vector<Entry> getFreqSorted() const {
-    std::vector<Entry> entries;
-    entries.reserve(size());
-    Collect(root_.get(), &entries);
-    std::stable_sort(entries.begin(), entries.end(),
-                     [](const Entry& a, const Entry& b) {
-                       return a.count > b.count;
-                     });
-    return entries;
+  // Fills items with all (value, count) pairs in sorted order.
+  void collectInfo(std::vector<std::pair<T, int>>& items) const {
+    Collect(root_.get(), items);
   }
 
  private:
@@ -79,11 +72,11 @@ class BST {
     return 1 + Size(node->left.get()) + Size(node->right.get());
   }
 
-  void Collect(const Node* node, std::vector<Entry>* entries) const {
+  void Collect(const Node* node, std::vector<std::pair<T, int>>& items) const {
     if (!node) return;
-    Collect(node->left.get(), entries);
-    entries->push_back({node->value, node->count});
-    Collect(node->right.get(), entries);
+    Collect(node->left.get(), items);
+    items.push_back({node->value, node->count});
+    Collect(node->right.get(), items);
   }
 };
 
