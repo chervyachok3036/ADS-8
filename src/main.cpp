@@ -4,13 +4,13 @@
 #include <iostream>
 #include <string>
 
-void MakeTree(BST<std::string>& tree, const char* filename);
-void PrintFreq(BST<std::string>& tree);
+void makeTree(BST<std::string>& tree, const char* filename);
+void printFreq(BST<std::string>& tree);
 
 int main() {
   BST<std::string> tree;
 
-  MakeTree(tree, "src/war_peace.txt");
+  makeTree(tree, "src/war_peace.txt");
 
   std::cout << "Tree depth:   " << tree.Depth() << "\n";
   std::cout << "Unique words: " << tree.Size()  << "\n";
@@ -20,7 +20,7 @@ int main() {
   std::cout << "Frequency of 'the':   " << tree.Search("the")   << "\n";
 
   std::cout << "\nWords sorted by frequency:\n";
-  PrintFreq(tree);
+  printFreq(tree);
 
   return 0;
 }
