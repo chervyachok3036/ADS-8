@@ -1,90 +1,50 @@
 // Copyright 2021 NNTU-CS
-#ifndef INCLUDE_BST_H_
-#define INCLUDE_BST_H_
-
-#include <algorithm>
-#include <memory>
+#include <cctype>
+#include <fstream>
+#include <iostream>
 #include <string>
-#include <utility>
 #include <vector>
 
-template <typename T>
-class BST {
- public:
-  struct Entry {
-    T value;
-    int count;
-  };
+#include "bst.h"
 
-  void insert(const T& value) { root_ = Insert(std::move(root_), value); }
-
-  int depth() const { return Depth(root_.get()); }
-
-  int search(const T& value) const {
-    Node* node = Search(root_.get(), value);
-    return node ? node->count : 0;
+void makeTree(BST<std::string>& tree, const char* filename) {
+  std::ifstream file(filename);
+  if (!file) {
+    std::cerr << "File error: " << filename << "\n";
+    return;
   }
 
-  int size() const { return Size(root_.get()); }
+  std::string word;
+  int ch;
 
-  std::vector<Entry> getFreqSorted() const {
-    std::vector<Entry> entries;
-    entries.reserve(size());
-    Collect(root_.get(), &entries);
-    std::stable_sort(entries.begin(), entries.end(),
-                     [](const Entry& a, const Entry& b) {
-                       return a.count > b.count;
-                     });
-    return entries;
-  }
-
- private:
-  struct Node {
-    T value;
-    int count;
-    std::unique_ptr<Node> left;
-    std::unique_ptr<Node> right;
-
-    explicit Node(const T& val) : value(val), count(1) {}
-  };
-
-  std::unique_ptr<Node> root_;
-
-  std::unique_ptr<Node> Insert(std::unique_ptr<Node> node, const T& value) {
-    if (!node) return std::make_unique<Node>(value);
-    if (value < node->value) {
-      node->left = Insert(std::move(node->left), value);
-    } else if (value > node->value) {
-      node->right = Insert(std::move(node->right), value);
-    } else {
-      ++node->count;
+  while ((ch = file.get()) != EOF) {
+    if (std::isalpha(ch) && static_cast<unsigned char>(ch) < 128) {
+      word += static_cast<char>(std::tolower(ch));
+    } else if (!word.empty()) {
+      tree.insert(word);
+      word.clear();
     }
-    return node;
   }
 
-  int Depth(const Node* node) const {
-    if (!node) return 0;
-    return 1 + std::max(Depth(node->left.get()), Depth(node->right.get()));
+  if (!word.empty()) {
+    tree.insert(word);
+  }
+}
+
+void printFreq(BST<std::string>& tree) {
+  std::vector<BST<std::string>::Entry> entries = tree.getFreqSorted();
+
+  for (const auto& entry : entries) {
+    std::cout << entry.value << " " << entry.count << "\n";
   }
 
-  Node* Search(Node* node, const T& value) const {
-    if (!node) return nullptr;
-    if (value == node->value) return node;
-    if (value < node->value) return Search(node->left.get(), value);
-    return Search(node->right.get(), value);
+  std::ofstream out("result/freq.txt");
+  if (!out) {
+    std::cerr << "Warning: could not write result/freq.txt\n";
+    return;
   }
 
-  int Size(const Node* node) const {
-    if (!node) return 0;
-    return 1 + Size(node->left.get()) + Size(node->right.get());
+  for (const auto& entry : entries) {
+    out << entry.value << " " << entry.count << "\n";
   }
-
-  void Collect(const Node* node, std::vector<Entry>* entries) const {
-    if (!node) return;
-    Collect(node->left.get(), entries);
-    entries->push_back({node->value, node->count});
-    Collect(node->right.get(), entries);
-  }
-};
-
-#endif  // INCLUDE_BST_H_
+}
